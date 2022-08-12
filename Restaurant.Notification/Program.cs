@@ -21,11 +21,6 @@ namespace Restaurant.Notification
             Host.CreateDefaultBuilder(args)
                 .ConfigureServices((hostContext, services) =>
                 {
-                    //IConfigurationRoot config = new ConfigurationBuilder()
-                    //    .SetBasePath(AppDomain.CurrentDomain.BaseDirectory)
-                    //    .AddJsonFile("appsettings.json").Build();
-                    //IConfigurationSection sect = config.GetSection("HostConfig");
-
                     services.AddMassTransit(x =>
                     {
                         x.AddConsumer<NotifierTableBookedConsumer>();
@@ -34,21 +29,6 @@ namespace Restaurant.Notification
 
                         x.UsingRabbitMq((context,cfg) =>
                         {
-                            //cfg.Host(
-                            //    sect.GetSection("HostName").Value,
-                            //    ushort.Parse(sect.GetSection("Port").Value),
-                            //    sect.GetSection("VirtualHost").Value,
-                            //    h =>
-                            //    {
-                            //        h.UseSsl(s =>
-                            //        {
-                            //            s.Protocol = SslProtocols.Tls12;
-                            //        });
-
-                            //        h.Username(sect.GetSection("UserName").Value);
-                            //        h.Password(sect.GetSection("Password").Value);
-                            //    });
-
                             cfg.UseMessageRetry(r =>
                             {
                                 r.Exponential(5,
