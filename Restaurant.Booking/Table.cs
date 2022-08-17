@@ -20,34 +20,27 @@ namespace Lesson1
         //unbook
         public bool SetState(EnumState state)
         {
-            lock (_lock)
-            {
-                if (state == State)
-                    return false;
-            
-                State = state;
-                OrderId = null;
+            if (state == State)
+                return false;
 
-                return true;
-            }
+            State = state;
+            OrderId = null;
+
+            return true;
         }
 
         //book
         public bool SetState(EnumState state, Guid orderId)
         {
-            lock (_lock)
-            {
-                if (state == State)
-                    return false;
+            if (state == State)
+                return false;
 
-                State = state;
-                OrderId = orderId;
+            State = state;
+            OrderId = orderId;
 
-                return true;
-            }
+            return true;
         }
 
-        private readonly object _lock = new object();
         private static readonly Random Random = new ();        
     }
 }

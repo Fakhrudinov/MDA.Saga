@@ -17,7 +17,7 @@ namespace Restaurant.Kitchen
                     dish.Name = EnumDishes.Lasagna.ToString();
                     return (false, dish);
                 default:
-                    throw new ArgumentOutOfRangeException();
+                    return (false, dish);
             }
         }
     }

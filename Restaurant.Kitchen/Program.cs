@@ -21,12 +21,40 @@ namespace Restaurant.Kitchen
             Host.CreateDefaultBuilder(args)
                 .ConfigureServices((hostContext, services) =>
                 {
+                    IConfigurationRoot config = new ConfigurationBuilder()
+                        .SetBasePath(AppDomain.CurrentDomain.BaseDirectory)
+                        .AddJsonFile("appsettings.json").Build();
+                    IConfigurationSection sect = config.GetSection("HostConfig");
+
+                    bool shouldUseSSL = Boolean.Parse(sect.GetSection("ShouldUseSSL").Value);
+
                     services.AddMassTransit(x =>
                     {
-                        x.AddConsumer<KitchenTableBookedConsumer>();
+                        x.AddConsumer<KitchenRequestedConsumer>()
+                            .Endpoint(e =>
+                            {
+                                e.Temporary = true;
+                            }); 
 
                         x.UsingRabbitMq((context, cfg) =>
                         {
+                            cfg.Host(
+                                sect.GetSection("HostName").Value,
+                                ushort.Parse(sect.GetSection("Port").Value),
+                                sect.GetSection("VirtualHost").Value,
+                                h =>
+                                {
+                                    if (shouldUseSSL)
+                                    {
+                                        h.UseSsl(s =>
+                                        {
+                                            s.Protocol = SslProtocols.Tls12;
+                                        });
+                                    }
+                                    h.Username(sect.GetSection("UserName").Value);
+                                    h.Password(sect.GetSection("Password").Value);
+                                });
+
                             cfg.UseMessageRetry(r =>
                             {
                                 r.Exponential(5,

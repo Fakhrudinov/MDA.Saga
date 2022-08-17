@@ -2,9 +2,10 @@
 
 namespace Restaurant.Messages.Interfaces
 {
-    public interface ICancellationBooking
+    public interface INotify
     {
         public Guid OrderId { get; }
-        public Dish? Dish { get; }
+        public Guid ClientId { get; }
+        public string Message { get; }
     }
 }

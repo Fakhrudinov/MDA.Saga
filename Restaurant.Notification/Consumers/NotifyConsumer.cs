@@ -4,18 +4,18 @@ using System.Threading.Tasks;
 
 namespace Restaurant.Notification.Consumers
 {
-    public class CancellationBookingConsumer : IConsumer<ICancellationBooking>
+    public class NotifyConsumer : IConsumer<INotify>
     {
         private readonly Notifier _notifier;
 
-        public CancellationBookingConsumer(Notifier notifier)
+        public NotifyConsumer(Notifier notifier)
         {
             _notifier = notifier;
         }
 
-        public Task Consume(ConsumeContext<ICancellationBooking> context)
+        public Task Consume(ConsumeContext<INotify> context)
         {
-            _notifier.Notify(context.Message.OrderId, context.Message.Dish);
+            _notifier.Notify(context.Message.OrderId, context.Message.ClientId, context.Message.Message);
 
             return context.ConsumeCompleted;
         }

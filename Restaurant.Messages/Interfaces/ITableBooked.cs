@@ -6,7 +6,6 @@ namespace Restaurant.Messages.Interfaces
     {
         public Guid OrderId { get; }
         public Guid ClientId { get; }
-        public Dish? PreOrder { get; }
-        public bool Success { get; set; }
+        Dish? Dish { get; }
     }
 }

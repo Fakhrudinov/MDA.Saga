@@ -2,9 +2,8 @@
 
 namespace Restaurant.Messages.Interfaces
 {
-    public interface IKitchenAccident
+    public interface IBookingCancelRequested
     {
         public Guid OrderId { get; }
-        public Dish Dish { get; }
     }
 }

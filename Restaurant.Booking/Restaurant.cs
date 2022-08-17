@@ -12,6 +12,7 @@ namespace Restaurant.Booking
     {
         private readonly List<Table> _tables = new ();
         private System.Timers.Timer _timerResetTablesBooking;
+        private Mutex _mutex = new Mutex();
 
         public Restaurant()
         {
@@ -20,7 +21,7 @@ namespace Restaurant.Booking
                 _tables.Add(new Table(i));
             }
 
-            _timerResetTablesBooking = new System.Timers.Timer(120_000);
+            _timerResetTablesBooking = new System.Timers.Timer(300_000);
             _timerResetTablesBooking.AutoReset = true;
             _timerResetTablesBooking.Elapsed += new ElapsedEventHandler(ResetAllTablesBooking);
             _timerResetTablesBooking.Start();
@@ -31,16 +32,27 @@ namespace Restaurant.Booking
             Console.WriteLine($"Спасибо за Ваше обращение, я подберу столик и подтвержу вашу бронь #{orderId}," +
                               "\r\nВам придет уведомление");
 
-            var table = _tables.FirstOrDefault(t => t.SeatsCount > countOfPersons
+            _mutex.WaitOne();
+            Table table = _tables.FirstOrDefault(t => t.SeatsCount > countOfPersons
                                                         && t.State == EnumState.Free);
-            await Task.Delay(1000 * 1); //у нас нерасторопные менеджеры, 5 секунд они находятся в поисках стола
-            
-            return table?.SetState(EnumState.Booked, orderId);
+            var result = table?.SetState(EnumState.Booked, orderId);
+            _mutex.ReleaseMutex();
+
+            await Task.Delay(1000 * 1);
+
+            if (result == true)
+            {
+                return true;
+            }
+            else
+            {
+                return null;
+            }
         }
 
-        public void CancelReservationAsync(Guid orderId, CancellationToken token = default)
+        public async Task CancelReservationAsync(Guid orderId, CancellationToken token = default)
         {
-            Task.Run(async () =>
+            await Task.Run(async () =>
             {
                 var table = _tables.Where(t => t.OrderId == orderId).FirstOrDefault();
 
